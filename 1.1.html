@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Validator</title>
+  
+  <!--CSS-->
+  <style>
+    .form-container {max-width:400px;margin:50px auto;padding:30px;border:1px solid #ddd;border-radius:8px;}
+    .form-group {margin-bottom:20px;}
+    label{display:block;margin-bottom:5px;font-weight:bold;}
+    input{width:100%;padding:10px;border:2px solid #ddd;border-radius:4px;font-size:14px;}
+    input.valid{border-color:#28a745;}
+    input.invalid{border-color:#dc3545;}
+    .error-message{color:#dc3545;font-size:12px;margin-top:5px;display:none;}
+    .error-message.show{display:block;}
+    button[type="submit"]{width:100%;padding:12px;background:#007bff;color:white;border:none;border-radius:4px;font-size:16px;cursor:pointer;}
+    button[type="submit"]:disabled{background:#ccc;cursor:not-allowed;}
+  </style>
+</head>
+
+<body>
+  <div class="form-container"> <!--tạo form-->
+    <h2>Sign Up Form</h2> <!--tiêu đề form-->
+    <form id="signupForm">
+
+        <!--component bên trong form-->
+      <div class="form-group"> 
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Please enter your username">
+        <div class="error-message" id="usernameError"></div> <!--hiển thị thông báo lỗi input(sai dữ liệu trong username thì hàm showError sẽ được gọi)-->
+    </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="text" id="email" placeholder="Enter your email">
+        <div class="error-message" id="emailError"></div> <!--hiển thị thông báo lỗi input(pls enter valid email address)-->
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password">
+        <div class="error-message" id="passwordError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm password">
+        <div class="error-message" id="confirmPasswordError"></div>
+      </div>
+
+      <button type="submit" id="submitBtn" disabled>Sign Up</button>
+    </form>
+  </div>
+
+  <script>
+    const usernameInput = document.getElementById('username'); // lấy input gán cho id : username
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const validity = { username:false, email:false, password:false, confirmPassword:false }; //object validity chứa 4 thuộc tính (khai là false vì ban đầu trường rỗng)
+
+    //chuỗi anchor : /^...$/ : bắt buộc khớp từ đầu đến cuối
+    function validateUsername(value){ return /^[a-zA-Z0-9]{4,20}$/.test(value); } // chuỗi phải chạy theo đúng quy định từ đầu đến cuối ( có chữ thường, chữ in hoa , kéo dài ít nhất là 4 dài nhất là 20)
+    function validateEmail(value){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); } // chấp nhận bất kì kí tự nào ngoài khoảng trắng và băt buộc phải có kí tự '@'
+    function validatePassword(value){ return /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value); } // có ít nhất 1 chữ số, chấp nhận cả chữ A và a ít nhất có 8 kí tự
+    function validatePasswordMatch(p1,p2){ return p1===p2 && p1!==''; } // khi giống nhau và p1 không rỗng
+
+    function showError(fieldId,message){
+      const input=document.getElementById(fieldId); //lấy input (id)
+      const errorDiv=document.getElementById(fieldId+'Error'); // fieldId + 'Error' = id của thẻ div hiển thị lỗi (UsernameError)
+      input.classList.add('invalid'); // 2 dòng này hiển thị css
+      input.classList.remove('valid');
+      errorDiv.textContent=message; //gán nội dung lỗi
+      errorDiv.classList.add('show'); // display
+    }
+
+    function clearError(fieldId){ // xóa nội dung lỗi
+      const input=document.getElementById(fieldId);
+      const errorDiv=document.getElementById(fieldId+'Error');
+      input.classList.add('valid');
+      input.classList.remove('invalid');
+      errorDiv.textContent=''; // xóa ndung thông báo lỗi, đặt thành rỗng
+      errorDiv.classList.remove('show'); // loại bỏ thông báo
+    }
+
+    function validateForm(){
+      if(validateUsername(usernameInput.value)){validity.username=true;clearError('username');} // lấy giá trị hiện tại tại trường usernamee, nếu validity howjpw lệ thì clearError
+      else{validity.username=false;showError('username','Username must be 4–20 alphanumeric characters.');}
+
+      if(validateEmail(emailInput.value)){validity.email=true;clearError('email');}
+      else{validity.email=false;showError('email','Please enter a valid email address.');}
+
+      if(validatePassword(passwordInput.value)){validity.password=true;clearError('password');}
+      else{validity.password=false;showError('password','Password must be at least 8 characters, include an uppercase letter and a number.');}
+
+      if(validatePasswordMatch(passwordInput.value,confirmPasswordInput.value)){validity.confirmPassword=true;clearError('confirmPassword');}
+      else{validity.confirmPassword=false;showError('confirmPassword','Passwords do not match.');}
+
+      const allValid = Object.values(validity).every(v=>v);
+      submitBtn.disabled=!allValid; // nếu tất cả các trường hợp lệ thì enable nút submit (submitBtn.disabled=false)
+    }
+
+
+    //listen for input events
+    usernameInput.addEventListener('input',validateForm); //gán listener vào username, gọi validteForm(event)
+    emailInput.addEventListener('input',validateForm);
+    passwordInput.addEventListener('input',validateForm);
+    confirmPasswordInput.addEventListener('input',validateForm);
+
+    document.getElementById('signupForm').addEventListener('submit',e=>{ //ktra form ( e => nhận event)
+      e.preventDefault();
+      if(Object.values(validity).every(v=>v)){
+        alert('Form submitted successfully!');
+      } else {
+        alert('Please fix the errors before submitting.');
+      }
+    });
+  </script>
+</body>
+</html>
