@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 8px; }
+        .btn { padding: 10px 20px; margin-right: 10px; cursor: pointer; }
+        .error { border-color: red; }
+        .error-message { color: red; font-size: 12px; display: block; margin-top: 3px; }
+    </style>
+</head>
+<body>
+    <!-- TODO: Dynamic title (Add/Edit) -->
+
+    <h1 th:text="${product.id} == null ? 'Add Product' : 'Edit Product'">Product Form</h1>
+
+    
+    <!-- TODO: Create form with th:action and th:object -->
+    <form th:action="@{/products/save}" th:object="${product}" method="post">
+    <!-- Hidden field for id -->
+        <input type="hidden" th:field="*{id}"/>
+    <!-- Input fields for all product properties -->
+        <div class="form-group">
+            <label for="productCode">Product Code *</label>
+            <input type="text" 
+                   id="productCode" 
+                   th:field="*{productCode}" 
+                   th:errorclass="error" 
+                   required/>
+            <span th:if="${#fields.hasErrors('productCode')}" 
+                  th:errors="*{productCode}" 
+                  class="error-message">Error</span>
+        </div>
+        <div class="form-group">
+            <label for="name">Name *</label>
+            <input type="text" 
+                   id="name" 
+                   th:field="*{name}" 
+                   th:errorclass="error" 
+                   required/>
+            <span th:if="${#fields.hasErrors('name')}" 
+                  th:errors="*{name}" 
+                  class="error-message">Error</span>
+        </div>
+        <div class="form-group">
+            <label for="price">Price *</label>
+            <input type="number" 
+                   step="0.01" 
+                   id="price" 
+                   th:field="*{price}" 
+                   th:errorclass="error" 
+                   required/>
+            <span th:if="${#fields.hasErrors('price')}" 
+                  th:errors="*{price}" 
+                  class="error-message">Error</span>
+        </div>
+        <div class="form-group">
+            <label for="quantity">Quantity *</label>
+            <input type="number" 
+                   id="quantity" 
+                   th:field="*{quantity}" 
+                   th:errorclass="error" 
+                   required/>
+            <span th:if="${#fields.hasErrors('quantity')}" 
+                  th:errors="*{quantity}" 
+                  class="error-message">Error</span>
+        </div>
+        <div class="form-group">
+            <label for="category">Category *</label>
+            <input type="text" 
+                   id="category" 
+                   th:field="*{category}" 
+                   th:errorclass="error" 
+                   required/>
+            <span th:if="${#fields.hasErrors('category')}" 
+                  th:errors="*{category}" 
+                  class="error-message">Error</span>
+        </div>
+        <!-- Save and Cancel buttons -->
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="/products" class="btn btn-secondary">Cancel</a>
+    </form>
+</body>
+</html>

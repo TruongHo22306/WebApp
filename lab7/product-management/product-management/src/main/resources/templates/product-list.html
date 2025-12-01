@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product List</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        .btn { padding: 5px 10px; text-decoration: none; color: white; border-radius: 3px; }
+        .btn-primary { background-color: #4CAF50; }
+        .btn-danger { background-color: #f44336; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-error { background-color: #f8d7da; color: #721c24; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { margin-right: 15px; text-decoration: none; color: #4CAF50; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/products">Products</a>
+    </div>
+    
+    <h1>Product Management</h1>
+    
+    <!-- TODO: Display success message if exists -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    
+    <!-- TODO: Display error message if exists -->
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+    
+    <!-- TODO: Add "New Product" button -->
+    <a href="/products/new" class="btn btn-primary">New Product</a>
+    
+    <!-- TODO: Add category filter -->
+    <form th:action="@{/products}" method="get" style="margin-top: 10px; display: inline-block;">
+        <label for="category">Filter by Category:</label>
+        <select name="category" id="category" onchange="this.form.submit()" style="padding: 5px;">
+            <option value="">All Categories</option>
+            <option th:each="cat : ${categories}" 
+                    th:value="${cat}" 
+                    th:text="${cat}"
+                    th:selected="${cat == selectedCategory}">
+            </option>
+        </select>
+        <!-- Hidden fields to maintain sorting -->
+        <input type="hidden" name="sortBy" th:value="${sortBy}" />
+        <input type="hidden" name="sortDir" th:value="${sortDir}" />
+    </form>
+    
+    <!-- TODO: Add search form -->
+    <form th:action="@{/products/search}" method="get" style="margin-top: 10px;">
+        <input type="text" name="keyword" placeholder="Search products..." th:value="${keyword}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    
+    <!-- TODO: Create table with products -->
+    <table style="margin-top: 20px;">
+        <thead>
+            <tr>
+                <th>
+                    <a th:href="@{/products(category=${selectedCategory},sortBy='id',sortDir=${sortBy=='id' && sortDir=='asc'?'desc':'asc'})}">
+                        ID
+                        <span th:if="${sortBy=='id'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/products(category=${selectedCategory},sortBy='productCode',sortDir=${sortBy=='productCode' && sortDir=='asc'?'desc':'asc'})}">
+                        Product Code
+                        <span th:if="${sortBy=='productCode'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/products(category=${selectedCategory},sortBy='name',sortDir=${sortBy=='name' && sortDir=='asc'?'desc':'asc'})}">
+                        Name
+                        <span th:if="${sortBy=='name'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/products(category=${selectedCategory},sortBy='price',sortDir=${sortBy=='price' && sortDir=='asc'?'desc':'asc'})}">
+                        Price
+                        <span th:if="${sortBy=='price'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/products(category=${selectedCategory},sortBy='quantity',sortDir=${sortBy=='quantity' && sortDir=='asc'?'desc':'asc'})}">
+                        Quantity
+                        <span th:if="${sortBy=='quantity'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/products(category=${selectedCategory},sortBy='category',sortDir=${sortBy=='category' && sortDir=='asc'?'desc':'asc'})}">
+                        Category
+                        <span th:if="${sortBy=='category'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.id}">1</td>
+                <td th:text="${product.productCode}">P001</td>
+                <td th:text="${product.name}">Sample Product</td>
+                <td th:text="${product.price}">100.00</td>
+                <td th:text="${product.quantity}">10</td>
+                <td th:text="${product.category}">Category A</td>
+                <td>
+                    <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-primary">Edit</a>
+                    <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-danger" 
+                       onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- TODO: Pagination controls -->
+    <div th:if="${totalPages != null && totalPages > 1}" style="margin-top: 20px; text-align: center;">
+        <p>Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span> 
+           (Total items: <span th:text="${totalItems}">0</span>)</p>
+        
+        <div style="margin-top: 10px;">
+            <!-- Previous button -->
+            <a th:if="${currentPage > 0}" 
+               th:href="@{/products/search(keyword=${keyword}, page=${currentPage - 1}, size=10)}" 
+               class="btn btn-primary">Previous</a>
+            
+            <!-- Page numbers -->
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:if="${i != currentPage}" 
+                   th:href="@{/products/search(keyword=${keyword}, page=${i}, size=10)}" 
+                   th:text="${i + 1}"
+                   style="padding: 5px 10px; margin: 0 2px; text-decoration: none; color: #4CAF50;">1</a>
+                <span th:if="${i == currentPage}" 
+                      th:text="${i + 1}"
+                      style="padding: 5px 10px; margin: 0 2px; background-color: #4CAF50; color: white; border-radius: 3px;">1</span>
+            </span>
+            
+            <!-- Next button -->
+            <a th:if="${currentPage < totalPages - 1}" 
+               th:href="@{/products/search(keyword=${keyword}, page=${currentPage + 1}, size=10)}" 
+               class="btn btn-primary">Next</a>
+        </div>
+    </div>
+    
+</body>
+</html>
