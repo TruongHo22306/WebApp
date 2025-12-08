@@ -2,13 +2,16 @@ package com.example.customerapi.controller;
 
 import com.example.customerapi.dto.CustomerRequestDTO;
 import com.example.customerapi.dto.CustomerResponseDTO;
+import com.example.customerapi.dto.CustomerUpdateDTO;
 import com.example.customerapi.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -23,8 +26,44 @@ public class CustomerRestController {
 
     // GET /api/customers - Get all customers
     @GetMapping
-    public ResponseEntity<List<CustomerResponseDTO>> getAllCustomers() {
-        List<CustomerResponseDTO> customers = customerService.getAllCustomers();
+    public ResponseEntity<Map<String, Object>> getAllCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+
+        var customerPage = customerService.getAllCustomers(page, size, sortBy, sortDir);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("customers", customerPage.getContent());
+        response.put("currentPage", customerPage.getNumber());
+        response.put("totalItems", customerPage.getTotalElements());
+        response.put("totalPages", customerPage.getTotalPages());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // GET /api/customers/status/{status} - Filter customers by status
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<CustomerResponseDTO>> getCustomersByStatus(@PathVariable String status) {
+        List<CustomerResponseDTO> customers = customerService.getCustomersByStatus(status);
+        return ResponseEntity.ok(customers);
+    }
+
+    // GET /api/customers/advanced-search?name=...&email=...&status=...
+    @GetMapping("/advanced-search")
+    public ResponseEntity<List<CustomerResponseDTO>> advancedSearch(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String status) {
+        List<CustomerResponseDTO> customers = customerService.advancedSearch(name, email, status);
+        return ResponseEntity.ok(customers);
+    }
+
+    // GET /api/customers/search?keyword=xxx - Search customers
+    @GetMapping("/search")
+    public ResponseEntity<List<CustomerResponseDTO>> searchCustomers(@RequestParam String keyword) {
+        List<CustomerResponseDTO> customers = customerService.searchCustomers(keyword);
         return ResponseEntity.ok(customers);
     }
 
@@ -51,6 +90,16 @@ public class CustomerRestController {
             @Valid @RequestBody CustomerRequestDTO requestDTO) {
 
         CustomerResponseDTO updated = customerService.updateCustomer(id, requestDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    // PATCH /api/customers/{id} - Partial update customer
+    @PatchMapping("/{id}")
+    public ResponseEntity<CustomerResponseDTO> partialUpdateCustomer(
+            @PathVariable Long id,
+            @RequestBody CustomerUpdateDTO updateDTO) {
+
+        CustomerResponseDTO updated = customerService.partialUpdateCustomer(id, updateDTO);
         return ResponseEntity.ok(updated);
     }
 

@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Customer API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Customers",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/customers?page=0&size=10",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers"],
+          "query": [
+            {"key": "page", "value": "0"},
+            {"key": "size", "value": "10"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Customer By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/customers/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers", "1"]
+        }
+      }
+    },
+    {
+      "name": "Create Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerCode\": \"C010\",\n  \"fullName\": \"New Customer\",\n  \"email\": \"new@example.com\",\n  \"phone\": \"+1-555-0000\",\n  \"address\": \"123 Any St\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/customers",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers"]
+        }
+      }
+    },
+    {
+      "name": "Update Customer (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerCode\": \"C001\",\n  \"fullName\": \"Updated Name\",\n  \"email\": \"updated@example.com\",\n  \"phone\": \"+1-555-1111\",\n  \"address\": \"Updated Address\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/customers/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers", "1"]
+        }
+      }
+    },
+    {
+      "name": "Partial Update (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Partially Updated Name\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/customers/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers", "1"]
+        }
+      }
+    },
+    {
+      "name": "Delete Customer",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/customers/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers", "1"]
+        }
+      }
+    },
+    {
+      "name": "Search Customers",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/customers/search?keyword=john",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers", "search"],
+          "query": [
+            {"key": "keyword", "value": "john"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filter By Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/customers/status/ACTIVE",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers", "status", "ACTIVE"]
+        }
+      }
+    },
+    {
+      "name": "Advanced Search",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/customers/advanced-search?name=john&email=@example.com&status=ACTIVE",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "customers", "advanced-search"],
+          "query": [
+            {"key": "name", "value": "john"},
+            {"key": "email", "value": "@example.com"},
+            {"key": "status", "value": "ACTIVE"}
+          ]
+        }
+      }
+    }
+  ]
+}
